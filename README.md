@@ -1,2 +1,4 @@
 # conradar
-settings test
+
+Mike Digan
+mcdigan@mavs.coloradomesa.edu
