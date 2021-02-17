@@ -9,13 +9,21 @@ import com.google.android.material.tabs.TabLayout;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.provider.ContactsContract;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
+
+import java.util.ArrayList;
 
 import edu.coloradomesa.cs.conradar.ui.main.SectionsPagerAdapter;
 
 public class MainActivity extends AppCompatActivity {
+
+    ArrayList<Contact> contacts = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,5 +43,38 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+    }
+
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+        EditText customMessage = (EditText)findViewById(R.id.custom_message_text);
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.default_message_radio_select:
+                if (checked)
+                    customMessage.setVisibility(View.GONE);
+                    System.out.println("default");
+                    break;
+            case R.id.custom_message_radio_select:
+                if (checked)
+                    System.out.println("custom");
+                    customMessage.setVisibility(View.VISIBLE);
+                    break;
+        }
+    }
+
+    public void onClick(View view) {
+        EditText firstName, lastName, tempEmail, tempMessage = null;
+        firstName = (EditText) findViewById(R.id.emergency_contact_firstname);
+        String fName = firstName.getText().toString();
+        lastName = (EditText) findViewById(R.id.emergency_contact_lastname);
+        String lName = lastName.getText().toString();
+        tempEmail = (EditText) findViewById(R.id.emergency_contact_email_address);
+        String email = tempEmail.getText().toString();
+        Contact c = new Contact(fName, lName, email);
+        contacts.add(c);
+        c.show1();
+        //if(R.id.custom_message_radio_select)
     }
 }

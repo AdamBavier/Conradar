@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Andriod_App-Conradar.iml" filepath="$PROJECT_DIR$/.idea/modules/Andriod_App-Conradar.iml" group="Conradar" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Conradar.iml" filepath="$PROJECT_DIR$/.idea/modules/Conradar.iml" group="Conradar" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Conradar-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Conradar-app.iml" group="Conradar/app" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" group="Conradar/app" />
     </modules>
   </component>
