@@ -118,12 +118,14 @@ public class MapFragment extends Fragment{
                 }
                 Log.d("ConRadar", "NO");
                 googleMap.setMyLocationEnabled(true);
-                fusedLocationClient.getLastLocation();
                 fusedLocationClient.getLastLocation().addOnSuccessListener((Activity) getContext(), new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
+                        if (location == null){
+                            return;
+                        }
                         LatLng currentpos = new LatLng(location.getLatitude(), location.getLongitude());
-                        CameraPosition cameraPosition = new CameraPosition.Builder().target(currentpos).zoom(12).build();
+                        CameraPosition cameraPosition = new CameraPosition.Builder().target(currentpos).zoom(11).build();
                         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
                     }
