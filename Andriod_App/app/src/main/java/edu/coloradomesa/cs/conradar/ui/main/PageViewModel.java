@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModel;
 
 public class PageViewModel extends ViewModel {
 
+    private int returnIndex;
+
     private MutableLiveData<Integer> mIndex = new MutableLiveData<>();
     private LiveData<String> mText = Transformations.map(mIndex, new Function<Integer, String>() {
         @Override
@@ -17,7 +19,12 @@ public class PageViewModel extends ViewModel {
     });
 
     public void setIndex(int index) {
+        returnIndex = index;
         mIndex.setValue(index);
+    }
+
+    public int getIndex() {
+        return returnIndex;
     }
 
     public LiveData<String> getText() {

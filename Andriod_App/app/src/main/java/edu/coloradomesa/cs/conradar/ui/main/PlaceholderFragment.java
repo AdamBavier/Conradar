@@ -46,14 +46,18 @@ public class PlaceholderFragment extends Fragment {
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_main, container, false);
+        View root = inflater.inflate(R.layout.fragment_map, container, false);
+        View emergency_settings = inflater.inflate(R.layout.emergency_settings_fragment, container, false);
+        View preferences = inflater.inflate(R.layout.preferences, container, false);
         final TextView textView = root.findViewById(R.id.section_label);
-        pageViewModel.getText().observe(this, new Observer<String>() {
+        /*pageViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
             }
-        });
-        return root;
+        });*/
+        if(pageViewModel.getIndex() == 1) return root;
+        else if(pageViewModel.getIndex() == 2) return emergency_settings;
+        else return preferences;
     }
 }
