@@ -18,8 +18,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,11 +31,15 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 
+import edu.coloradomesa.cs.conradar.MainActivity;
 import edu.coloradomesa.cs.conradar.R;
 
 /**
@@ -41,7 +48,9 @@ import edu.coloradomesa.cs.conradar.R;
  * create an instance of this fragment.
  */
 
-public class MapFragment extends Fragment{
+
+public class MapFragment extends Fragment implements GoogleMap.OnMarkerDragListener {
+
 
     private MapView mMapView;
     private GoogleMap googleMap;
@@ -50,7 +59,7 @@ public class MapFragment extends Fragment{
     private LocationManager locationManager;
     private static final long MIN_TIME = 400;
     private static final float MIN_DISTANCE = 1000;
-
+    Circle oldCircle = null;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -62,6 +71,7 @@ public class MapFragment extends Fragment{
     private String mParam1;
     private String mParam2;
 
+    Marker crclMarker;
     public MapFragment() {
         // Required empty public constructor
     }
@@ -127,10 +137,30 @@ public class MapFragment extends Fragment{
                         LatLng currentpos = new LatLng(location.getLatitude(), location.getLongitude());
                         CameraPosition cameraPosition = new CameraPosition.Builder().target(currentpos).zoom(11).build();
                         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                        addMarker(currentpos, 1000);
 
                     }
                 });
 
+            }
+        });
+        SeekBar radiusBar = (SeekBar)view.findViewById(R.id.seekBar);
+        // perform seek bar change listener event used for getting the progress value
+        radiusBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int progressChangedValue = 0;
+
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                progressChangedValue = progress;
+            }
+
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                Log.d("yes", "it do :" + seekBar.getProgress());
+                //addCircle(oldCircle.getCenter(), seekBar.getProgress() * 100);
+                setRadius(seekBar.getProgress()*100);
             }
         });
         return view;
@@ -155,5 +185,69 @@ public class MapFragment extends Fragment{
         super.onLowMemory();
         mMapView.onLowMemory();
     }
+    public void addMarker(LatLng latLng, int radius){
+        crclMarker = googleMap.addMarker(new MarkerOptions()
+            .position(latLng)
+            .draggable(true)
+            .title("geofence")
+            .snippet("Lat")
+            );
+        googleMap.setOnMarkerDragListener(this);
+        CircleOptions crcl = new CircleOptions()
+                .center(latLng)
+                .radius(radius);
+       oldCircle = googleMap.addCircle(crcl);
+    }
+    public Circle addCircle(LatLng latLng, int radius){
+        CircleOptions crcl = new CircleOptions()
+                .center(latLng)
+                .radius(radius);
+        Circle circle = googleMap.addCircle(crcl);
+        return circle;
+    }
 
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+
+    }
+    public void setRadius(int radius){
+
+        if (oldCircle !=null){
+            LatLng center = oldCircle.getCenter();
+            oldCircle.remove();
+            oldCircle = null;
+        }
+        oldCircle = addCircle(crclMarker.getPosition(), radius);
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+        double radius = 1000;
+        if (oldCircle !=null){
+            radius = oldCircle.getRadius();
+            oldCircle.remove();
+            oldCircle = null;
+        }
+        LatLng pos = marker.getPosition();
+
+        oldCircle = addCircle(pos, (int)radius);
+    }
+    public void setGeoFence(){
+        Log.d("yes", String.valueOf(oldCircle.getCenter().latitude));
+
+        Geofence fence = new Geofence.Builder()
+               .setRequestId("idk")
+                .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                .setCircularRegion(oldCircle.getCenter().latitude,
+                        oldCircle.getCenter().longitude,
+                        (float)oldCircle.getRadius())
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT)
+                .build();
+
+    }
 }

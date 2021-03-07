@@ -24,6 +24,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         super(fm);
         mContext = context;
     }
+    Fragment mapfragment = MapFragment.newInstance("YES","NO");
 
     @Override
     public Fragment getItem(int position) {
@@ -32,7 +33,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         Fragment fragment = null;
         switch (position) {
             case 0:
-                fragment = MapFragment.newInstance("YES", "NO");
+                fragment = mapfragment;
                 break;
             case 1:
                 fragment = PlaceholderFragment.newInstance(position + 1);
