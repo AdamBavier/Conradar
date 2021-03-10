@@ -1,6 +1,211 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <ScrollView
+        android:id="@+id/scrollView3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/default_message_tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="35dp"
+                android:layout_marginTop="35dp"
+                android:text="Default Message" />
+
+            <EditText
+                android:id="@+id/editTextTextMultiLine"
+                android:layout_width="317dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="35dp"
+                android:layout_marginTop="35dp"
+                android:ems="10"
+                android:gravity="start|top"
+                android:hint="@string/default_email_message"
+                android:inputType="textMultiLine"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/default_timeout_tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="35dp"
+                android:layout_marginTop="35dp"
+                android:text="Default Adventure Length" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:layout_marginStart="140dp"
+                android:layout_marginTop="35dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/adventure_length"
+                    android:layout_width="25dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="1"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/day_hour_tag"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_weight="1"
+                    android:text="Day"
+                    android:textSize="18sp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <ImageButton
+                        android:id="@+id/increase_hours"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="increaseTime"
+                        app:srcCompat="@android:drawable/arrow_up_float" />
+
+                    <ImageButton
+                        android:id="@+id/decrease_hours"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="decreaseTime"
+                        app:srcCompat="@android:drawable/arrow_down_float" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/recurring_dates_tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="35dp"
+                android:layout_marginTop="35dp"
+                android:text="Recurring Adventure Dates" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/repeating_dates_chip"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="35dp"
+                android:theme="@style/Theme.MaterialComponents.DayNight"
+                app:chipSpacingHorizontal="0dp"
+                app:singleLine="false"
+                app:singleSelection="false">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/Sunday_chip"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="S"
+                    app:checkedIcon="@null"
+                    app:checkedIconEnabled="true"
+                    app:rippleColor="#009688" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/Monday_chip"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:padding="0dp"
+                    android:text="M"
+                    app:checkedIcon="@null"
+                    app:checkedIconEnabled="true"
+                    app:rippleColor="#009688" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/Tuesday_chip"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="T"
+                    app:checkedIcon="@null"
+                    app:checkedIconEnabled="true"
+                    app:rippleColor="#009688" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/Wednesday_chip"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="W"
+                    app:checkedIcon="@null"
+                    app:checkedIconEnabled="true"
+                    app:rippleColor="#009688" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/Thursday_chip"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="T"
+                    app:checkedIcon="@null"
+                    app:checkedIconEnabled="true"
+                    app:rippleColor="#009688" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/Friday_chip"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="F"
+                    app:checkedIcon="@null"
+                    app:checkedIconEnabled="true"
+                    app:rippleColor="#009688" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/Saturday_chip"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="S"
+                    app:checkedIcon="@null"
+                    app:checkedIconEnabled="true"
+                    app:rippleColor="#009688" />
+            </com.google.android.material.chip.ChipGroup>
+
+            <Button
+                android:id="@+id/submit_changes_button"
+                android:layout_width="317dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="35dp"
+                android:layout_marginTop="70dp"
+                android:layout_marginBottom="70dp"
+                android:onClick="updateInformation"
+                android:text="Submit Changes" />
+
+        </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
