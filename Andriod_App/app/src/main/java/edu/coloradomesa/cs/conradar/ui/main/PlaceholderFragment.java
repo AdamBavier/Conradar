@@ -6,10 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import edu.coloradomesa.cs.conradar.R;
@@ -47,7 +45,7 @@ public class PlaceholderFragment extends Fragment {
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_map, container, false);
-        View emergency_settings = inflater.inflate(R.layout.emergency_settings_fragment, container, false);
+        View emergency_settings = inflater.inflate(R.layout.add_contact_view, container, false);
         View preferences = inflater.inflate(R.layout.preferences, container, false);
         final TextView textView = root.findViewById(R.id.section_label);
         /*pageViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {

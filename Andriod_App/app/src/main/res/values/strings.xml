@@ -3,7 +3,7 @@
     <string name="tab_text_1">Map Settings</string>
     <string name="tab_text_2">Contact Settings</string>
     <string name="tab_text_3">Preferences</string>
-    <string name="default_email_message">--Default Message--\nDear *Contact*,\n \nThis is an automated message informing you that *your name* began a trip beginning on *start date* and has not returned. The recent location information for *your name* can be found here. </string>
+    <string name="default_email_message">Dear *Contact*,\n \nThis is an automated message informing you that *your name* began a trip beginning on *start date* and has not returned. The recent location information for *your name* can be found here. </string>
     <string name="emergency_contact">Emergency Contact:</string>
     <string name="emergency_message">Emergency Message:</string>
     <string name="first_name">First Name</string>
@@ -14,4 +14,5 @@
     <string name="custom_message">Custom Message</string>
     <string name="add_contact">Add Contact</string>
     <string name="hello_blank_fragment">Hello</string>
+    <string name="update_information">Update Information</string>
 </resources>

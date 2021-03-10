@@ -10,6 +10,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -20,12 +22,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.ScrollView;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import edu.coloradomesa.cs.conradar.ui.main.MapFragment;
@@ -34,7 +41,11 @@ import edu.coloradomesa.cs.conradar.ui.main.SectionsPagerAdapter;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
 
+    private int timeOut = 24;
+
     ArrayList<Contact> contacts = new ArrayList<>();
+    List<String> namesList = new ArrayList<>();
+
     ViewPager viewPager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
         FloatingActionButton fab = findViewById(R.id.fab);
-
+        namesList.add("Select Contact");
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -54,11 +65,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         .setAction("Action", null).show();
             }
         });
-
-
     }
 
-    public void onRadioButtonClicked(View view) {
+    public void onMessageRadioGroupClicked(View view) {
         // Is the button now checked?
         boolean checked = ((RadioButton) view).isChecked();
         EditText customMessage = (EditText)findViewById(R.id.custom_message_text);
@@ -67,17 +76,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             case R.id.default_message_radio_select:
                 if (checked)
                     customMessage.setVisibility(View.GONE);
-                    System.out.println("default");
                     break;
             case R.id.custom_message_radio_select:
                 if (checked)
-                    System.out.println("custom");
                     customMessage.setVisibility(View.VISIBLE);
                     break;
         }
     }
 
-    public void onClick(View view) {
+    public void onAddEditRadioGroupClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+        ScrollView addContacts = (ScrollView) findViewById(R.id.add_contact_scroll_view);
+        ScrollView editContacts = (ScrollView) findViewById(R.id.edit_contacts_scrollview);
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.add_contact_radio:
+                if (checked)
+                    System.out.println("HERE");
+                    addContacts.setVisibility(View.VISIBLE);
+                    editContacts.setVisibility(View.GONE);
+                break;
+            case R.id.edit_contact_radio:
+                if (checked)
+                    System.out.println("BEER");
+                    addContacts.setVisibility(View.GONE);
+                    editContacts.setVisibility(View.VISIBLE);
+                    Spinner s = (Spinner) findViewById(R.id.contact_list_spinner);
+                    s.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, namesList));
+                break;
+        }
+    }
+
+    public void addContact(View view) {
         EditText firstName, lastName, tempEmail, tempMessage = null;
         firstName = (EditText) findViewById(R.id.emergency_contact_firstname);
         String fName = firstName.getText().toString();
@@ -86,8 +117,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         tempEmail = (EditText) findViewById(R.id.emergency_contact_email_address);
         String email = tempEmail.getText().toString();
         Contact c = new Contact(fName, lName, email);
+        String name = fName + " " + lName;
+        namesList.add(name);
         contacts.add(c);
-        c.show1();
+        firstName.setText("");
+        lastName.setText("");
+        tempEmail.setText("");
         //if(R.id.custom_message_radio_select)
     }
     @Override
@@ -99,6 +134,50 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
+    }
+
+    public void increaseTime(View view) {
+        TextView adventureLength = (TextView)findViewById(R.id.adventure_length);
+        TextView dayVsHour = (TextView)findViewById(R.id.day_hour_tag);
+        if(timeOut < 24) timeOut++;
+        else timeOut += 24;
+        if(timeOut >= 24) {
+            String strTime = String.valueOf(timeOut / 24);
+            if(timeOut / 24 == 1) dayVsHour.setText("Day");
+            else dayVsHour.setText("Days");
+            adventureLength.setText(strTime);
+        }
+        else {
+            adventureLength.setText(Integer.toString(timeOut));
+            if(timeOut == 1) dayVsHour.setText("Hour");
+            else dayVsHour.setText("Hours");
+        }
+    }
+
+    public void decreaseTime(View view) {
+        TextView adventureLength = (TextView)findViewById(R.id.adventure_length);
+        TextView dayVsHour = (TextView)findViewById(R.id.day_hour_tag);
+        if(timeOut == 0);
+        else if(timeOut <= 24) timeOut--;
+        else timeOut -= 24;
+        if(timeOut >= 24) {
+            String strTime = String.valueOf(timeOut / 24);
+            if(timeOut / 24 == 1) dayVsHour.setText("Day");
+            else dayVsHour.setText("Days");
+            adventureLength.setText(strTime);
+        }
+        else {
+            adventureLength.setText(Integer.toString(timeOut));
+            if(timeOut == 1) dayVsHour.setText("Hour");
+            else dayVsHour.setText("Hours");
+        }
+    }
+
+    public void updateInformation(View view) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
+
+        myRef.setValue("New message");
     }
 
     public void setGeoFence(View view) {

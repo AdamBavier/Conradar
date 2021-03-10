@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "764597872560",
+    "project_id": "conradar-f3fb3",
+    "storage_bucket": "conradar-f3fb3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:764597872560:android:1e0ee8d4e05d22258fd875",
+        "android_client_info": {
+          "package_name": "edu.coloradomesa.cs.conradar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "764597872560-v5gmpnn5gm50jdshagbrd71sk42tufc0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKMUtpdVy2NdifZOXcRaVd4KKPyhwcewg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "764597872560-v5gmpnn5gm50jdshagbrd71sk42tufc0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
