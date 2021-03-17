@@ -1,18 +1,31 @@
 package edu.coloradomesa.cs.conradar;
 
+import android.Manifest;
+import android.app.PendingIntent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -47,6 +60,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     List<String> namesList = new ArrayList<>();
 
     ViewPager viewPager;
+    private int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
+    private GeofencingClient geofencingClient;
+    private GeoFenceHelper geoFenceHelper;
+    private String GEOFENCE_ID = "SOME_GEOFENCE_ID";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,22 +83,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         .setAction("Action", null).show();
             }
         });
+
+        geofencingClient = LocationServices.getGeofencingClient(this);
+        geoFenceHelper = new GeoFenceHelper(this);
     }
 
     public void onMessageRadioGroupClicked(View view) {
         // Is the button now checked?
         boolean checked = ((RadioButton) view).isChecked();
-        EditText customMessage = (EditText)findViewById(R.id.custom_message_text);
+        EditText customMessage = (EditText) findViewById(R.id.custom_message_text);
         // Check which radio button was clicked
-        switch(view.getId()) {
+        switch (view.getId()) {
             case R.id.default_message_radio_select:
                 if (checked)
                     customMessage.setVisibility(View.GONE);
-                    break;
+                break;
             case R.id.custom_message_radio_select:
                 if (checked)
                     customMessage.setVisibility(View.VISIBLE);
-                    break;
+                break;
         }
     }
 
@@ -90,20 +111,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         ScrollView addContacts = (ScrollView) findViewById(R.id.add_contact_scroll_view);
         ScrollView editContacts = (ScrollView) findViewById(R.id.edit_contacts_scrollview);
         // Check which radio button was clicked
-        switch(view.getId()) {
+        switch (view.getId()) {
             case R.id.add_contact_radio:
                 if (checked)
                     System.out.println("HERE");
-                    addContacts.setVisibility(View.VISIBLE);
-                    editContacts.setVisibility(View.GONE);
+                addContacts.setVisibility(View.VISIBLE);
+                editContacts.setVisibility(View.GONE);
                 break;
             case R.id.edit_contact_radio:
                 if (checked)
                     System.out.println("BEER");
-                    addContacts.setVisibility(View.GONE);
-                    editContacts.setVisibility(View.VISIBLE);
-                    Spinner s = (Spinner) findViewById(R.id.contact_list_spinner);
-                    s.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, namesList));
+                addContacts.setVisibility(View.GONE);
+                editContacts.setVisibility(View.VISIBLE);
+                Spinner s = (Spinner) findViewById(R.id.contact_list_spinner);
+                s.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, namesList));
                 break;
         }
     }
@@ -125,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         tempEmail.setText("");
         //if(R.id.custom_message_radio_select)
     }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -136,39 +158,71 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    private void enableUserLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+
+        } else {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
+
+            }
+        }
+    }
+
+    public void onRequestPermissionResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == FINE_LOCATION_ACCESS_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+                mMap.setMyLocationEnabled(true);
+            } else {
+
+            }
+        }
+    }
+
     public void increaseTime(View view) {
-        TextView adventureLength = (TextView)findViewById(R.id.adventure_length);
-        TextView dayVsHour = (TextView)findViewById(R.id.day_hour_tag);
-        if(timeOut < 24) timeOut++;
+        TextView adventureLength = (TextView) findViewById(R.id.adventure_length);
+        TextView dayVsHour = (TextView) findViewById(R.id.day_hour_tag);
+        if (timeOut < 24) timeOut++;
         else timeOut += 24;
-        if(timeOut >= 24) {
+        if (timeOut >= 24) {
             String strTime = String.valueOf(timeOut / 24);
-            if(timeOut / 24 == 1) dayVsHour.setText("Day");
+            if (timeOut / 24 == 1) dayVsHour.setText("Day");
             else dayVsHour.setText("Days");
             adventureLength.setText(strTime);
-        }
-        else {
+        } else {
             adventureLength.setText(Integer.toString(timeOut));
-            if(timeOut == 1) dayVsHour.setText("Hour");
+            if (timeOut == 1) dayVsHour.setText("Hour");
             else dayVsHour.setText("Hours");
         }
     }
 
     public void decreaseTime(View view) {
-        TextView adventureLength = (TextView)findViewById(R.id.adventure_length);
-        TextView dayVsHour = (TextView)findViewById(R.id.day_hour_tag);
-        if(timeOut == 0);
-        else if(timeOut <= 24) timeOut--;
+        TextView adventureLength = (TextView) findViewById(R.id.adventure_length);
+        TextView dayVsHour = (TextView) findViewById(R.id.day_hour_tag);
+        if (timeOut == 0) ;
+        else if (timeOut <= 24) timeOut--;
         else timeOut -= 24;
-        if(timeOut >= 24) {
+        if (timeOut >= 24) {
             String strTime = String.valueOf(timeOut / 24);
-            if(timeOut / 24 == 1) dayVsHour.setText("Day");
+            if (timeOut / 24 == 1) dayVsHour.setText("Day");
             else dayVsHour.setText("Days");
             adventureLength.setText(strTime);
-        }
-        else {
+        } else {
             adventureLength.setText(Integer.toString(timeOut));
-            if(timeOut == 1) dayVsHour.setText("Hour");
+            if (timeOut == 1) dayVsHour.setText("Hour");
             else dayVsHour.setText("Hours");
         }
     }
@@ -180,14 +234,46 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         myRef.setValue("New message");
     }
 
+    List<Geofence> geofenceList;
+
+    private GeofencingRequest getGeofencingRequest() {
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+        builder.addGeofences(geofenceList);
+        return builder.build();
+    }
+
+    public void addGeoFence(LatLng latLng, float radius) {
+        Geofence geofence = geoFenceHelper.getGeoFence(GEOFENCE_ID, latLng, radius,
+                Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT);
+        PendingIntent pendingIntent = geoFenceHelper.getPendingIntent();
+        GeofencingRequest geofencingRequest = geoFenceHelper.getGeofencingRequest(geofence);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        geofencingClient.addGeofences(geofencingRequest, pendingIntent)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("yes", "geofencesuccess");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        String errormessage =  geoFenceHelper.getErrorString(e);
+                        Log.d("yes", errormessage);
+                    }
+                });
+    }
     public void setGeoFence(View view) {
         Log.d("Yes", "btnclick");
 
-          ViewPager mPager = viewPager;
+        ViewPager mPager = viewPager;
         PagerAdapter adapter = mPager.getAdapter();
         int fragmentIndex = mPager.getCurrentItem();
         SectionsPagerAdapter spa = (SectionsPagerAdapter) adapter;
         MapFragment currentFragment = (MapFragment) spa.getItem(fragmentIndex);
-        currentFragment.setGeoFence();
+        //currentFragment.setGeoFence();
         }
     }

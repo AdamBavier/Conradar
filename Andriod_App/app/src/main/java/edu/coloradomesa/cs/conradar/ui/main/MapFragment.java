@@ -7,10 +7,12 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.Debug;
@@ -39,6 +41,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 
+import java.util.List;
+
 import edu.coloradomesa.cs.conradar.MainActivity;
 import edu.coloradomesa.cs.conradar.R;
 
@@ -65,7 +69,6 @@ public class MapFragment extends Fragment implements GoogleMap.OnMarkerDragListe
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -224,20 +227,35 @@ public class MapFragment extends Fragment implements GoogleMap.OnMarkerDragListe
         }
         oldCircle = addCircle(crclMarker.getPosition(), radius);
     }
+    private int BACKGROUND_LOCATION_ACCESS_REQUEST_CODE = 100002;
 
     @Override
     public void onMarkerDragEnd(Marker marker) {
-        double radius = 1000;
+        float radius = 1000;
         if (oldCircle !=null){
-            radius = oldCircle.getRadius();
+            radius = (float) oldCircle.getRadius();
             oldCircle.remove();
             oldCircle = null;
         }
         LatLng pos = marker.getPosition();
-
         oldCircle = addCircle(pos, (int)radius);
+        /*
+        if(Build.VERSION.SDK_INT >= 29){
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED){
+
+            }
+            else{
+                if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)){
+                    ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION}, BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
+                }
+            }
+        }
+        */
+
+        ((MainActivity)getActivity()).addGeoFence(marker.getPosition(), radius);
+
     }
-    public void setGeoFence(){
+    public void setGeoFence(List<Geofence> geofenceList){
         Log.d("yes", String.valueOf(oldCircle.getCenter().latitude));
 
         Geofence fence = new Geofence.Builder()
