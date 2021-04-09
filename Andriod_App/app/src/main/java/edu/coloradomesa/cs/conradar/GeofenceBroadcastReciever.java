@@ -125,28 +125,6 @@ public class GeofenceBroadcastReciever extends BroadcastReceiver  {
         }
     }
 
-    public void setAlarms(Context context){
-        Intent backgroundloc = new Intent(context,TestService.class);
-
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        PendingIntent pendingIntent = PendingIntent.getService(context, 0, backgroundloc, 0);
-        if (pendingIntent != null && alarmManager != null){
-            alarmManager.cancel(pendingIntent);
-        }
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,System.currentTimeMillis(),
-                1000 * 60 * 60,
-                pendingIntent);
-
-        context.startService(backgroundloc);
-
-        //This only ran once for whatever reason
-        /*
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_HOUR,
-                AlarmManager.INTERVAL_HOUR, pendingIntent);
-                */
-
-    }
     public void delAlarms(Context context, Intent intent){
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         PendingIntent pendingIntent = PendingIntent.getService(context, 10, intent, PendingIntent.FLAG_CANCEL_CURRENT);

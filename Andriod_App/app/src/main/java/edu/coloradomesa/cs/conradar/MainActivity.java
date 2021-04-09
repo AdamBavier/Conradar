@@ -111,6 +111,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
         namesList.add("Select Contact");
+
+        checkPermissions();
+        geofencingClient = LocationServices.getGeofencingClient(this);
+        geoFenceHelper = new GeoFenceHelper(this);
     }
 
     public void loadData(View view) {
