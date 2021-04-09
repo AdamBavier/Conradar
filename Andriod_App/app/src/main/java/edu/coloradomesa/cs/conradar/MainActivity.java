@@ -65,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GeoFenceHelper geoFenceHelper;
     private String GEOFENCE_ID = "SOME_GEOFENCE_ID";
 
+    FirebaseDBHelper dbHelper = new FirebaseDBHelper();
+    FirebaseDatabase db = dbHelper.getDB();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         .setAction("Action", null).show();
             }
         });
-
+        checkPermissions();
         geofencingClient = LocationServices.getGeofencingClient(this);
         geoFenceHelper = new GeoFenceHelper(this);
     }
@@ -147,51 +150,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //if(R.id.custom_message_radio_select)
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-
-    }
-
-    private void enableUserLocation() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true);
-
-        } else {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
-
-            }
-        }
-    }
-
-    public void onRequestPermissionResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == FINE_LOCATION_ACCESS_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                mMap.setMyLocationEnabled(true);
-            } else {
-
-            }
-        }
-    }
-
     public void increaseTime(View view) {
         TextView adventureLength = (TextView) findViewById(R.id.adventure_length);
         TextView dayVsHour = (TextView) findViewById(R.id.day_hour_tag);
@@ -229,9 +187,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void updateInformation(View view) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
+        String parent = "Parent";
+        String child = "Parent/child";
+        DatabaseReference myRef = database.getReference(parent);
+        myRef.setValue("parent Was Here");
+        DatabaseReference children = database.getReference(child);
+        children.setValue("Child is here");
+    }
 
-        myRef.setValue("New message");
+
+    public void checkPermissions(){
+        if (ContextCompat.checkSelfPermission( this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,  new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+        } else {
+            // permission granted
+        }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
     }
 
     List<Geofence> geofenceList;
@@ -256,6 +232,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d("yes", "geofencesuccess");
+
+
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -263,17 +241,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     public void onFailure(@NonNull Exception e) {
                         String errormessage =  geoFenceHelper.getErrorString(e);
                         Log.d("yes", errormessage);
+                        return;
                     }
                 });
-    }
-    public void setGeoFence(View view) {
-        Log.d("Yes", "btnclick");
+        DatabaseReference geofenceLat = db.getReference(dbHelper.getRootSTR() + "GeofenceLat");
+        DatabaseReference geofenceLng = db.getReference(dbHelper.getRootSTR() + "GeofenceLng");
 
-        ViewPager mPager = viewPager;
-        PagerAdapter adapter = mPager.getAdapter();
-        int fragmentIndex = mPager.getCurrentItem();
-        SectionsPagerAdapter spa = (SectionsPagerAdapter) adapter;
-        MapFragment currentFragment = (MapFragment) spa.getItem(fragmentIndex);
-        //currentFragment.setGeoFence();
-        }
+        DatabaseReference geofenceRad = db.getReference(dbHelper.getRootSTR() + "GeofenceRad");
+
+        geofenceLat.setValue(latLng.latitude);
+        geofenceLng.setValue(latLng.longitude);
+        geofenceRad.setValue(radius);
+    }
+
     }

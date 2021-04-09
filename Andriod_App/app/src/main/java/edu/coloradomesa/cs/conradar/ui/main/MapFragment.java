@@ -39,10 +39,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.List;
 
+import edu.coloradomesa.cs.conradar.FirebaseDBHelper;
 import edu.coloradomesa.cs.conradar.MainActivity;
 import edu.coloradomesa.cs.conradar.R;
 
@@ -55,10 +61,13 @@ import edu.coloradomesa.cs.conradar.R;
 
 public class MapFragment extends Fragment implements GoogleMap.OnMarkerDragListener {
 
-
+    String TAG = MapFragment.class.getSimpleName();
     private MapView mMapView;
     private GoogleMap googleMap;
     private FusedLocationProviderClient fusedLocationClient;
+
+    FirebaseDBHelper dbHelper = new FirebaseDBHelper();
+    FirebaseDatabase db = dbHelper.getDB();
 
     private LocationManager locationManager;
     private static final long MIN_TIME = 400;
@@ -78,6 +87,7 @@ public class MapFragment extends Fragment implements GoogleMap.OnMarkerDragListe
     public MapFragment() {
         // Required empty public constructor
     }
+
 
     /**
      * Use this factory method to create a new instance of
@@ -108,11 +118,18 @@ public class MapFragment extends Fragment implements GoogleMap.OnMarkerDragListe
 
 
     }
+    //Since variable is accessed within inner class, global variable is easiest fix :/
+    private int geofenceRadius = 0;
+    private LatLng geofenceLatLng;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_map, null, false);
+
+
+
+        final View view = inflater.inflate(R.layout.fragment_map, null, false);
         mMapView = (MapView) view.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
         mMapView.onResume();
@@ -126,7 +143,6 @@ public class MapFragment extends Fragment implements GoogleMap.OnMarkerDragListe
             public void onMapReady(GoogleMap mMap) {
                 googleMap = mMap;
                 if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    Log.d("ConRadar","YES");
                     return;
                 }
                 Log.d("ConRadar", "NO");
@@ -140,14 +156,54 @@ public class MapFragment extends Fragment implements GoogleMap.OnMarkerDragListe
                         LatLng currentpos = new LatLng(location.getLatitude(), location.getLongitude());
                         CameraPosition cameraPosition = new CameraPosition.Builder().target(currentpos).zoom(11).build();
                         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                        addMarker(currentpos, 1000);
+
+                        DatabaseReference geofenceLat = db.getReference(dbHelper.getRootSTR() + "GeofenceLat");
+                        DatabaseReference geofenceLng = db.getReference(dbHelper.getRootSTR() + "GeofenceLng");
+                        DatabaseReference geofenceRad = db.getReference(dbHelper.getRootSTR() + "GeofenceRad");
+                        DatabaseReference rootRf = db.getReference(dbHelper.getRootSTR());
+
+                        rootRf.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                Log.d(TAG, "DATA CHANGE");
+                                Log.d(TAG, "geofencelat: " + String.valueOf(snapshot.hasChild("GeofenceLat")));
+                                Log.d(TAG, "GeofenceLang: " + String.valueOf(snapshot.hasChild("GeofenceLng")));
+                                Log.d(TAG, "GeofenceRad: " + String.valueOf(snapshot.hasChild("GeofenceRad")));
+
+                                if (snapshot.hasChild("GeofenceLat") &&
+                                snapshot.hasChild("GeofenceLng") &&
+                                snapshot.hasChild("GeofenceRad")){
+                                    double lat = snapshot.child("GeofenceLat").getValue(double.class);
+                                    double lng  = snapshot.child("GeofenceLng").getValue(double.class);
+                                    int georadius =  snapshot.child("GeofenceRad").getValue(Integer.class);
+                                    geofenceLatLng = new LatLng(lat,lng);
+                                    geofenceRadius = georadius;
+                                    addMarker(geofenceLatLng, geofenceRadius);
+                                    setSeekBarProgress(georadius / 100, view);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                        Log.d(TAG, "latlng: " + geofenceLatLng + "geoRad: "+ geofenceRadius);
+                        if(geofenceLatLng != null && geofenceRadius != 0) {
+                            ((MainActivity)getActivity()).addGeoFence(geofenceLatLng, geofenceRadius);
+                        }else{
+                            //addMarker(currentpos,1000);
+                        }
 
                     }
                 });
 
             }
         });
+
+        DatabaseReference geofenceRad = db.getReference(dbHelper.getRootSTR() + "GeofenceRad");
         SeekBar radiusBar = (SeekBar)view.findViewById(R.id.seekBar);
+
         // perform seek bar change listener event used for getting the progress value
         radiusBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int progressChangedValue = 0;
@@ -161,12 +217,19 @@ public class MapFragment extends Fragment implements GoogleMap.OnMarkerDragListe
             }
 
             public void onStopTrackingTouch(SeekBar seekBar) {
-                Log.d("yes", "it do :" + seekBar.getProgress());
-                //addCircle(oldCircle.getCenter(), seekBar.getProgress() * 100);
-                setRadius(seekBar.getProgress()*100);
+                setRadius((seekBar.getProgress() +1)*100);
+                DatabaseReference radref = db.getReference(dbHelper.getRootSTR() + "GeofenceRad");
+                radref.setValue((seekBar.getProgress() +1) * 100);
+                ((MainActivity)getActivity()).addGeoFence(oldCircle.getCenter(), (seekBar.getProgress() +1)*100);
+
+
             }
         });
         return view;
+    }
+    public void setSeekBarProgress(int progress, View view){
+        SeekBar radiusBar = (SeekBar)view.findViewById(R.id.seekBar);
+        radiusBar.setProgress(progress);
     }
     @Override
     public void onResume() {
@@ -200,6 +263,18 @@ public class MapFragment extends Fragment implements GoogleMap.OnMarkerDragListe
                 .center(latLng)
                 .radius(radius);
        oldCircle = googleMap.addCircle(crcl);
+
+
+        DatabaseReference geofenceLat = db.getReference(dbHelper.getRootSTR() + "GeofenceLat");
+        DatabaseReference geofenceLng = db.getReference(dbHelper.getRootSTR() + "GeofenceLng");
+
+        DatabaseReference geofenceRad = db.getReference(dbHelper.getRootSTR() + "GeofenceRad");
+
+        geofenceLat.setValue(latLng.latitude);
+        geofenceLng.setValue(latLng.longitude);
+        geofenceRad.setValue(radius);
+
+
     }
     public Circle addCircle(LatLng latLng, int radius){
         CircleOptions crcl = new CircleOptions()
@@ -239,33 +314,11 @@ public class MapFragment extends Fragment implements GoogleMap.OnMarkerDragListe
         }
         LatLng pos = marker.getPosition();
         oldCircle = addCircle(pos, (int)radius);
-        /*
-        if(Build.VERSION.SDK_INT >= 29){
-            if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED){
 
-            }
-            else{
-                if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)){
-                    ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION}, BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
-                }
-            }
-        }
-        */
+
 
         ((MainActivity)getActivity()).addGeoFence(marker.getPosition(), radius);
 
     }
-    public void setGeoFence(List<Geofence> geofenceList){
-        Log.d("yes", String.valueOf(oldCircle.getCenter().latitude));
 
-        Geofence fence = new Geofence.Builder()
-               .setRequestId("idk")
-                .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                .setCircularRegion(oldCircle.getCenter().latitude,
-                        oldCircle.getCenter().longitude,
-                        (float)oldCircle.getRadius())
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT)
-                .build();
-
-    }
 }
