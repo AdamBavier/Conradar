@@ -1,12 +1,23 @@
 package edu.coloradomesa.cs.conradar;
 
+import android.Manifest;
+import android.app.PendingIntent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.chip.Chip;
@@ -19,6 +30,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.timessquare.CalendarPickerView;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 import android.provider.ContactsContract;
 import android.util.SparseIntArray;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -39,6 +56,7 @@ import android.widget.RadioButton;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import org.w3c.dom.Text;
@@ -49,6 +67,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import edu.coloradomesa.cs.conradar.ui.main.MapFragment;
 import edu.coloradomesa.cs.conradar.ui.main.SectionsPagerAdapter;
@@ -69,6 +88,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
     ViewPager viewPager;
+    private int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
+    private GeofencingClient geofencingClient;
+    private GeoFenceHelper geoFenceHelper;
+    private String GEOFENCE_ID = "SOME_GEOFENCE_ID";
+
+    FirebaseDBHelper dbHelper = new FirebaseDBHelper();
+    FirebaseDatabase db = dbHelper.getDB();
+
     private boolean showingDefaultMessage = false;
     private boolean showingAdventureLength = false;
     private boolean showingAdventureDays = false;
@@ -106,6 +133,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         });
+        checkPermissions();
+        geofencingClient = LocationServices.getGeofencingClient(this);
+        geoFenceHelper = new GeoFenceHelper(this);
 
         System.out.println("There are " + i[0] + " contacts");
 
@@ -202,16 +232,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     customMessage.setHint(defaultMessage);
                 break;
         }
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     public void increaseTime(View view) {
@@ -675,14 +695,63 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         DatabaseReference myRef2 = database.getReference("name");*/
     }
 
-    public void setGeoFence(View view) {
-        Log.d("Yes", "btnclick");
 
-          ViewPager mPager = viewPager;
-        PagerAdapter adapter = mPager.getAdapter();
-        int fragmentIndex = mPager.getCurrentItem();
-        SectionsPagerAdapter spa = (SectionsPagerAdapter) adapter;
-        MapFragment currentFragment = (MapFragment) spa.getItem(fragmentIndex);
-        currentFragment.setGeoFence();
+    public void checkPermissions(){
+        if (ContextCompat.checkSelfPermission( this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,  new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+        } else {
+            // permission granted
         }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+    }
+
+    List<Geofence> geofenceList;
+
+    private GeofencingRequest getGeofencingRequest() {
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+        builder.addGeofences(geofenceList);
+        return builder.build();
+    }
+
+    public void addGeoFence(LatLng latLng, float radius) {
+        Geofence geofence = geoFenceHelper.getGeoFence(GEOFENCE_ID, latLng, radius,
+                Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT);
+        PendingIntent pendingIntent = geoFenceHelper.getPendingIntent();
+        GeofencingRequest geofencingRequest = geoFenceHelper.getGeofencingRequest(geofence);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        geofencingClient.addGeofences(geofencingRequest, pendingIntent)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("yes", "geofencesuccess");
+
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        String errormessage =  geoFenceHelper.getErrorString(e);
+                        Log.d("yes", errormessage);
+                        return;
+                    }
+                });
+        DatabaseReference geofenceLat = db.getReference(dbHelper.getRootSTR() + "GeofenceLat");
+        DatabaseReference geofenceLng = db.getReference(dbHelper.getRootSTR() + "GeofenceLng");
+
+        DatabaseReference geofenceRad = db.getReference(dbHelper.getRootSTR() + "GeofenceRad");
+
+        geofenceLat.setValue(latLng.latitude);
+        geofenceLng.setValue(latLng.longitude);
+        geofenceRad.setValue(radius);
+    }
+
     }
