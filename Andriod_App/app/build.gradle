@@ -50,7 +50,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation platform('com.google.firebase:firebase-bom:26.6.0')
     implementation 'com.google.firebase:firebase-database'
+    implementation 'com.squareup:android-times-square:1.6.5@aar'
     implementation "androidx.work:work-runtime:$work_version"
-
-
 }

@@ -30,19 +30,28 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="35dp"
                 android:layout_marginTop="35dp"
+                android:clickable="true"
+                android:onClick="preferencesShowDefaultMessage"
                 android:text="Default Message" />
 
-            <EditText
-                android:id="@+id/editTextTextMultiLine"
-                android:layout_width="317dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="35dp"
-                android:layout_marginTop="35dp"
-                android:ems="10"
-                android:gravity="start|top"
-                android:hint="@string/default_email_message"
-                android:inputType="textMultiLine"
-                android:textSize="14sp" />
+            <LinearLayout
+                android:id="@+id/preferences_LinerarLayout_DefaultMessage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/preferences_set_default_message"
+                    android:layout_width="330dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="35dp"
+                    android:layout_marginTop="35dp"
+                    android:ems="10"
+                    android:gravity="start|top"
+                    android:inputType="textMultiLine"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/default_timeout_tag"
@@ -50,21 +59,24 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="35dp"
                 android:layout_marginTop="35dp"
+                android:clickable="true"
+                android:onClick="preferencesShowAdventureLength"
                 android:text="Default Adventure Length" />
 
             <LinearLayout
+                android:id="@+id/preferences_linearlayout_adventurelength"
                 android:layout_width="wrap_content"
                 android:layout_height="60dp"
                 android:layout_marginStart="140dp"
                 android:layout_marginTop="35dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/adventure_length"
                     android:layout_width="25dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="1"
                     android:textSize="18sp" />
 
                 <TextView
@@ -73,7 +85,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:layout_weight="1"
-                    android:text="Day"
                     android:textSize="18sp" />
 
                 <LinearLayout
@@ -104,101 +115,142 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="35dp"
                 android:layout_marginTop="35dp"
-                android:text="Recurring Adventure Dates" />
+                android:clickable="true"
+                android:onClick="preferencesShowAdventureDays"
+                android:text="Recurring Adventure Days" />
 
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/repeating_dates_chip"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/preferences_linearlayout_adventuredays"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginStart="30dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/repeating_dates_chip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="35dp"
+                    android:theme="@style/Theme.MaterialComponents.DayNight"
+                    app:chipSpacingHorizontal="0dp"
+                    app:singleLine="false"
+                    app:singleSelection="false">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/Sunday_chip"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="S"
+                        app:checkedIcon="@null"
+                        app:checkedIconEnabled="true"
+                        app:rippleColor="#009688" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/Monday_chip"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:padding="0dp"
+                        android:text="M"
+                        app:checkedIcon="@null"
+                        app:checkedIconEnabled="true"
+                        app:rippleColor="#009688" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/Tuesday_chip"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="T"
+                        app:checkedIcon="@null"
+                        app:checkedIconEnabled="true"
+                        app:rippleColor="#009688" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/Wednesday_chip"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="W"
+                        app:checkedIcon="@null"
+                        app:checkedIconEnabled="true"
+                        app:rippleColor="#009688" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/Thursday_chip"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="T"
+                        app:checkedIcon="@null"
+                        app:checkedIconEnabled="true"
+                        app:rippleColor="#009688" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/Friday_chip"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="F"
+                        app:checkedIcon="@null"
+                        app:checkedIconEnabled="true"
+                        app:rippleColor="#009688" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/Saturday_chip"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="S"
+                        app:checkedIcon="@null"
+                        app:checkedIconEnabled="true"
+                        app:rippleColor="#009688" />
+
+                </com.google.android.material.chip.ChipGroup>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/set_trip_dates_tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="35dp"
                 android:layout_marginTop="35dp"
-                android:theme="@style/Theme.MaterialComponents.DayNight"
-                app:chipSpacingHorizontal="0dp"
-                app:singleLine="false"
-                app:singleSelection="false">
+                android:clickable="true"
+                android:onClick="preferencesShowCalendar"
+                android:text="Set Trip Dates" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/Sunday_chip"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="S"
-                    app:checkedIcon="@null"
-                    app:checkedIconEnabled="true"
-                    app:rippleColor="#009688" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/preferences_constraintlayout_calendar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/Monday_chip"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="wrap_content"
+                <com.squareup.timessquare.CalendarPickerView
+                    android:id="@+id/calendar_view"
+                    android:layout_width="325dp"
                     android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:padding="0dp"
-                    android:text="M"
-                    app:checkedIcon="@null"
-                    app:checkedIconEnabled="true"
-                    app:rippleColor="#009688" />
+                    android:layout_marginStart="35dp"
+                    android:layout_marginTop="35dp"
+                    android:nestedScrollingEnabled="true"
+                    android:visibility="visible"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/Tuesday_chip"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="T"
-                    app:checkedIcon="@null"
-                    app:checkedIconEnabled="true"
-                    app:rippleColor="#009688" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/Wednesday_chip"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="W"
-                    app:checkedIcon="@null"
-                    app:checkedIconEnabled="true"
-                    app:rippleColor="#009688" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/Thursday_chip"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="T"
-                    app:checkedIcon="@null"
-                    app:checkedIconEnabled="true"
-                    app:rippleColor="#009688" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/Friday_chip"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="F"
-                    app:checkedIcon="@null"
-                    app:checkedIconEnabled="true"
-                    app:rippleColor="#009688" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/Saturday_chip"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="S"
-                    app:checkedIcon="@null"
-                    app:checkedIconEnabled="true"
-                    app:rippleColor="#009688" />
-            </com.google.android.material.chip.ChipGroup>
+                </com.squareup.timessquare.CalendarPickerView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <Button
                 android:id="@+id/submit_changes_button"
-                android:layout_width="317dp"
+                android:layout_width="325dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="35dp"
                 android:layout_marginTop="70dp"
@@ -208,4 +260,5 @@
 
         </LinearLayout>
     </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

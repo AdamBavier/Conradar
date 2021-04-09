@@ -19,16 +19,35 @@ public class Contact {
         this. message = message;
     }
 
-    public void show1() {
-        System.out.println(firstName);
-        System.out.println(lastName);
-        System.out.println(email);
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void show2() {
-        System.out.println(firstName);
-        System.out.println(lastName);
-        System.out.println(email);
-        System.out.println(message);
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }
