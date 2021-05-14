@@ -96,6 +96,32 @@
                 android:layout_marginTop="48dp"
                 android:text="@string/emergency_contact_email" />
 
+            <RadioGroup
+                android:id="@+id/email_phone_radio_group"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="35dp"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/email_radio_select"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:onClick="phoneVSemail"
+                    android:text="Email Address" />
+
+
+                <RadioButton
+                    android:id="@+id/phone_radio_select"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="55dp"
+                    android:onClick="phoneVSemail"
+                    android:text="Phone Number" />
+            </RadioGroup>
+
             <EditText
                 android:id="@+id/emergency_contact_email_address"
                 android:layout_width="317dp"
@@ -106,6 +132,14 @@
                 android:hint="@string/example_domain_com"
                 android:inputType="textWebEmailAddress|textPersonName"
                 android:textSize="14sp" />
+
+            <Spinner
+                android:id="@+id/phoneProviderSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="35dp"
+                android:layout_marginTop="10dp"
+                android:visibility="gone" />
 
             <RadioGroup
                 android:id="@+id/message_select"
@@ -160,13 +194,6 @@
                 android:layout_marginBottom="70dp"
                 android:onClick="addContact"
                 android:text="@string/add_contact" />
-
-            <Button
-                android:id="@+id/testButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="loadData"
-                android:text="Button" />
 
         </LinearLayout>
     </ScrollView>
@@ -239,6 +266,31 @@
                 android:layout_marginTop="48dp"
                 android:text="@string/emergency_contact_email" />
 
+            <RadioGroup
+                android:id="@+id/edit_phonevsemail"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="35dp"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/edit_email_radio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:onClick="editPhoneVSemail"
+                    android:text="Email Address" />
+
+                <RadioButton
+                    android:id="@+id/edit_phoneNumber_radio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="55dp"
+                    android:onClick="editPhoneVSemail"
+                    android:text="Phone Number" />
+            </RadioGroup>
+
             <EditText
                 android:id="@+id/edit_contact_email_address"
                 android:layout_width="317dp"
@@ -249,6 +301,14 @@
                 android:hint="@string/example_domain_com"
                 android:inputType="textEmailAddress"
                 android:textSize="14sp" />
+
+            <Spinner
+                android:id="@+id/edit_phoneProviderSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="35dp"
+                android:layout_marginTop="10dp"
+                android:visibility="gone" />
 
             <RadioGroup
                 android:id="@+id/edit_contact_message_radio_group"

@@ -5,18 +5,14 @@ public class Contact {
     private String lastName;
     private String email;
     private String message;
+    private boolean cellPhone;
 
-    public Contact(String firstName, String lastName, String email) {
+    public Contact(String firstName, String lastName, String email, String message, boolean cellPhone) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-    }
-
-    public Contact(String firstName, String lastName, String email, String message) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this. message = message;
+        this.message = message;
+        this.cellPhone = cellPhone;
     }
 
     public String getFirstName() {
@@ -49,5 +45,13 @@ public class Contact {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public boolean isCellPhone() {
+        return cellPhone;
+    }
+
+    public void setCellPhone(boolean cellPhone) {
+        this.cellPhone = cellPhone;
     }
 }

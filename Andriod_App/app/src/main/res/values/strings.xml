@@ -7,11 +7,17 @@
     <string name="emergency_message">Emergency Message:</string>
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
-    <string name="emergency_contact_email">Emergency Contact Email:</string>
+    <string name="emergency_contact_email">Emergency Contact Email/ Phone Number:</string>
     <string name="example_domain_com">example@domain.com</string>
     <string name="default_message">Default Message</string>
     <string name="custom_message">Custom Message</string>
     <string name="add_contact">Add Contact</string>
     <string name="hello_blank_fragment">Hello</string>
     <string name="update_information">Update Information</string>
+    <string-array name="phoneProviders">
+        <item>Verizon</item>
+        <item>Sprint</item>
+        <item>T-Mobile</item>
+        <item>AT&amp;T</item>
+    </string-array>
 </resources>
