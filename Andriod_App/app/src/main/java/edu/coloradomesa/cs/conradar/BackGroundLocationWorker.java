@@ -27,6 +27,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+/*
+This file sends location to firebase. This is used because context is not available in a broadcast
+Reciever
+ */
 public class BackGroundLocationWorker extends Worker {
     Context ctxt;
     public BackGroundLocationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
@@ -85,16 +89,21 @@ public class BackGroundLocationWorker extends Worker {
         currentloc.setValue(latLng);
 
         //Set Alert Time to 24 hours from now
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"));
+        DateFormat date = new SimpleDateFormat("yyyy:MM:dd:hh:mm a");
+        date.setTimeZone(TimeZone.getTimeZone("America/Denver"));
+
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Denver"));
+        DatabaseReference curTimeRef = db.getReference(dbHelper.getRootSTR() + "lastLocTime");
+        curTimeRef.setValue(date.format(cal.getTime()));
+
         cal.add(Calendar.HOUR, 24);
         Date currentlocaltime = cal.getTime();
-        DateFormat date = new SimpleDateFormat("yyyy:MM:dd:HH:mm a");
-        date.setTimeZone(TimeZone.getTimeZone("GMT+1:00"));
-        String timetoalert = date.format(currentlocaltime);
-        DatabaseReference currenttimeref = db.getReference(dbHelper.getRootSTR() + "Time to Alert");
-        currenttimeref.setValue(timetoalert);
 
-        Log.d("ye", "ye added");
+        String timetoalert = date.format(currentlocaltime);
+        DatabaseReference timeToAlertRef = db.getReference(dbHelper.getRootSTR() + "Time to Alert");
+        timeToAlertRef.setValue(timetoalert);
+
+        Log.d("ye", "Location Updated");
     }
 
     @SuppressLint("MissingPermission")

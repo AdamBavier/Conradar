@@ -128,7 +128,7 @@ public class MapFragment extends Fragment implements GoogleMap.OnMarkerDragListe
                              Bundle savedInstanceState) {
 
 
-
+        //setup for googlemaps view
         final View view = inflater.inflate(R.layout.fragment_map, null, false);
         mMapView = (MapView) view.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
@@ -153,13 +153,13 @@ public class MapFragment extends Fragment implements GoogleMap.OnMarkerDragListe
                         if (location == null){
                             return;
                         }
-                        LatLng currentpos = new LatLng(location.getLatitude(), location.getLongitude());
+                        final LatLng currentpos = new LatLng(location.getLatitude(), location.getLongitude());
                         CameraPosition cameraPosition = new CameraPosition.Builder().target(currentpos).zoom(11).build();
                         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                        DatabaseReference geofenceLat = db.getReference(dbHelper.getRootSTR() + "GeofenceLat");
-                        DatabaseReference geofenceLng = db.getReference(dbHelper.getRootSTR() + "GeofenceLng");
-                        DatabaseReference geofenceRad = db.getReference(dbHelper.getRootSTR() + "GeofenceRad");
+                        final DatabaseReference geofenceLat = db.getReference(dbHelper.getRootSTR() + "GeofenceLat");
+                        final DatabaseReference geofenceLng = db.getReference(dbHelper.getRootSTR() + "GeofenceLng");
+                        final DatabaseReference geofenceRad = db.getReference(dbHelper.getRootSTR() + "GeofenceRad");
                         DatabaseReference rootRf = db.getReference(dbHelper.getRootSTR());
 
                         rootRf.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -180,6 +180,11 @@ public class MapFragment extends Fragment implements GoogleMap.OnMarkerDragListe
                                     geofenceRadius = georadius;
                                     addMarker(geofenceLatLng, geofenceRadius);
                                     setSeekBarProgress(georadius / 100, view);
+                                }else{
+                                    geofenceLat.setValue(currentpos.latitude);
+                                    geofenceLng.setValue(currentpos.longitude);
+                                    geofenceRad.setValue(1000);
+                                    addMarker(currentpos, 1000);
                                 }
                             }
 

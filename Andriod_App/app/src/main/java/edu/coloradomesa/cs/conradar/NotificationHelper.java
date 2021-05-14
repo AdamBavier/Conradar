@@ -15,7 +15,9 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import java.util.Random;
-
+/*
+This file sets up how notifications will look on the device
+ */
 public class NotificationHelper extends ContextWrapper {
 
     private static final String TAG = "NotificationHelper";

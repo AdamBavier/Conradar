@@ -54,7 +54,7 @@ public class BackgroundLocationService extends IntentService {
         stopSelf();
     }
     public void setAlarms(Context context){
-
+        //Alarms cannot be set in the background like this, so this function is useless
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent backgroundloc = new Intent(context,BackgroundLocationService.class);
         PendingIntent pendingIntent = PendingIntent.getService(context, 0, backgroundloc, 0);
@@ -82,34 +82,22 @@ public class BackgroundLocationService extends IntentService {
         currentloc.setValue(latLng);
 
         //Set Alert Time to 24 hours from now
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"));
+        DateFormat date = new SimpleDateFormat("yyyy:MM:dd:HH:mm a");
+        date.setTimeZone(TimeZone.getTimeZone("America/Denver"));
+
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Denver"));
+        DatabaseReference curTimeRef = db.getReference(dbHelper.getRootSTR() + "lastLocTime");
+        curTimeRef.setValue(date.format(cal.getTime()));
+
         cal.add(Calendar.HOUR, 24);
         Date currentlocaltime = cal.getTime();
-        DateFormat date = new SimpleDateFormat("yyyy:MM:dd:HH:mm a");
-        date.setTimeZone(TimeZone.getTimeZone("GMT+1:00"));
+
         String timetoalert = date.format(currentlocaltime);
-        DatabaseReference currenttimeref = db.getReference(dbHelper.getRootSTR() + "Time to Alert");
-        currenttimeref.setValue(timetoalert);
+        DatabaseReference timeToAlertRef = db.getReference(dbHelper.getRootSTR() + "Time to Alert");
+        timeToAlertRef.setValue(timetoalert);
 
         Log.d("ye", "Location Updated");
     }
 
-    @SuppressLint("MissingPermission")
-    public void getLocation(){
-        final Location location;
-        FusedLocationProviderClient fusedLocationClient;
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        fusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-            @Override
-            public void onComplete(@NonNull Task<Location> task) {
-                Location last_known_location = task.getResult();
-
-                 LatLng latLng = new LatLng(last_known_location.getLatitude(),
-                         last_known_location.getLongitude());
-                 sendLocFirebase(latLng);
-
-            }
-        });
-    }
 }

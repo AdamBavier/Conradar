@@ -701,6 +701,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     public void checkPermissions(){
+        //This pulls up screen to ask for permissions
         if (ContextCompat.checkSelfPermission( this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,  new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         } else {
