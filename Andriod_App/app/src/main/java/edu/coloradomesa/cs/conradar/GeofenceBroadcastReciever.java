@@ -34,34 +34,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-public class GeofenceBroadcastReciever extends BroadcastReceiver  {
-    String rootstr = "Jack/" + "UniqueID/";
-    FirebaseDatabase database;
-    String TAG = GeofenceBroadcastReciever.class.getSimpleName();
+/*
+This file is what runs when the geofence is triggered
+ */
 
+
+public class GeofenceBroadcastReciever extends BroadcastReceiver  {
+    //String rootstr = "Jack/" + "UniqueID/";
+    //FirebaseDatabase database;
+    String TAG = GeofenceBroadcastReciever.class.getSimpleName();
+    FirebaseDBHelper dbHelper = new FirebaseDBHelper();
+    String rootstr = dbHelper.getRootSTR();
+    FirebaseDatabase database = dbHelper.getDB();
 
 
     private FusedLocationProviderClient fusedLocationProviderClient;
 
-    @SuppressLint("MissingPermission")
-    public void sendLocation(Context context) {
-        final DatabaseReference locRef = database.getReference(rootstr + "Location/current");
-
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
-
-        Location loc;
-        fusedLocationProviderClient.getLastLocation()
-                .addOnSuccessListener((Activity) context, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            locRef.setValue(location.getLongitude());
-                            // Logic to handle location object
-                        }
-                    }
-                });
-    }
 
 
     @Override
@@ -100,7 +88,8 @@ public class GeofenceBroadcastReciever extends BroadcastReceiver  {
 
                 break;
             case Geofence.GEOFENCE_TRANSITION_EXIT:
-                //locRef.setValue();
+
+                //
                 adventureMode.setValue("on");
                 WorkRequest uploadWorkRequest =
                         new OneTimeWorkRequest.Builder(BackGroundLocationWorker.class)
@@ -116,7 +105,7 @@ public class GeofenceBroadcastReciever extends BroadcastReceiver  {
                 //setAlarms(context);
                 //setFireBaseAlarmTime();
                 //Toast.makeText(context, "GEOFENCE EXIT", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("Going for an adventure?", "Let us know when you should be back!", MainActivity.class);
+                notificationHelper.sendHighPriorityNotification("Adventure mode is set to on!", "Your location will be sent if not updated within 24hrs!", MainActivity.class);
 
                 break;
             case Geofence.GEOFENCE_TRANSITION_DWELL:
@@ -125,14 +114,6 @@ public class GeofenceBroadcastReciever extends BroadcastReceiver  {
         }
     }
 
-    public void delAlarms(Context context, Intent intent){
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        PendingIntent pendingIntent = PendingIntent.getService(context, 10, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-
-        if(alarmManager != null){
-            alarmManager.cancel(pendingIntent);
-        }
-    }
 
 
 }
